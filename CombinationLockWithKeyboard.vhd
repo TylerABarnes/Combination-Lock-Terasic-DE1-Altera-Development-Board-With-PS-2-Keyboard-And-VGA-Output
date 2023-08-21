@@ -11,9 +11,9 @@ entity CombinationLockWithKeyboardAndVGA is
         ps2_clk                 : in std_logic;
         hex3, hex2, hex1, hex0  : out std_logic_vector(0 to 6);
         clock_50                : in std_logic;
-		  ledr                    : out STD_LOGIC_VECTOR (9 downto 0);
-		  ledg                    : out STD_LOGIC_VECTOR (7 downto 0);
-		  reset                   : in  STD_LOGIC;
+	ledr                    : out STD_LOGIC_VECTOR (9 downto 0);
+	ledg                    : out STD_LOGIC_VECTOR (7 downto 0);
+	reset                   : in  STD_LOGIC;
         Hsync                   : out STD_LOGIC;
         Vsync                   : out STD_LOGIC;
         vga_r                   : out STD_LOGIC_VECTOR (11 downto 0);
