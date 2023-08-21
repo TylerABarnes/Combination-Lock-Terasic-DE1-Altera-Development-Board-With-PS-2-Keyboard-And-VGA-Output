@@ -1,0 +1,47 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity VGA40 is
+    port (
+        clk : in std_logic;
+        h_sync, v_sync : out std_logic;
+        pixel_clk : out std_logic;
+        r, g, b : out std_logic_vector (7 downto 0)
+    );
+end VGA40;
+
+architecture behavior of VGA40 is
+    signal h_count : integer range 0 to 799 := 0;
+    signal v_count : integer range 0 to 524 := 0;
+
+    signal active : std_logic := '0';
+    signal pixel_active : std_logic := '0';
+begin
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if h_count < 799 then
+                h_count <= h_count + 1;
+            else
+                h_count <= 0;
+                if v_count < 524 then
+                    v_count <= v_count + 1;
+                else
+                    v_count <= 0;
+                end if;
+            end if;
+
+            active <= '1' when h_count < 640 and v_count < 480 else '0';
+
+            h_sync <= not ((h_count >= 96 and h_count < 800) or active = '0');
+            v_sync <= not ((v_count >= 2 and v_count < 525) or active = '0');
+        end if;
+    end process;
+
+    pixel_clk <= clk when active = '1' else '0';
+
+    r <= x"FF" when active = '1' else (others => '0');
+    g <= x"00" when active = '1' else (others => '0');
+    b <= x"00" when active = '1' else (others => '0');
+end behavior;

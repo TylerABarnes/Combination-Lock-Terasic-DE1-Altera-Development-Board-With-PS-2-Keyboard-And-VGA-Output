@@ -1,0 +1,32 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity KeyboardShift is
+    Port ( clk        : in  STD_LOGIC; -- System Clock
+           ps2_data   : in  STD_LOGIC; -- PS/2 data pin
+           ps2_clock  : in  STD_LOGIC; -- PS/2 clock pin
+           shift_data : out STD_LOGIC_VECTOR (7 downto 0)); -- Shifted data output
+end KeyboardShift;
+
+architecture Behavioral of KeyboardShift is
+    signal shift_reg : STD_LOGIC_VECTOR (7 downto 0) := "00000000";
+    signal last_ps2_clock : STD_LOGIC := '1'; -- Edge detection for the inverted clock
+begin
+
+process(clk)
+begin
+    if rising_edge(clk) then
+        -- Detect the falling edge of the PS/2 clock (inverted clock signal)
+        if last_ps2_clock = '1' and ps2_clock = '0' then
+            shift_reg <= shift_reg(6 downto 0) & ps2_data; -- Shift and concatenate new data bit
+        end if;
+        
+        last_ps2_clock <= ps2_clock; -- Store current PS/2 clock state for next detection
+    end if;
+end process;
+
+shift_data <= shift_reg; -- Output the shifted data
+
+end Behavioral;

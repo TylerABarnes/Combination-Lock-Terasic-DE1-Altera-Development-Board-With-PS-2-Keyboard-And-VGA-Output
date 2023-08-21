@@ -1,0 +1,97 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+-- Include the keyboard shift entity
+entity CombinationLockWithKeyboard is
+    port(
+        key : in std_logic_vector(3 downto 0);
+        ps2_dat : in std_logic;
+        ps2_clk : in std_logic;
+        hex3, hex2, hex1, hex0 : out std_logic_vector(0 to 6);
+        clock_50: in std_logic
+    );
+end entity;
+
+architecture rtl of CombinationLockWithKeyboard is
+
+    -- ... (Your existing code for hex_digit function, types, and signals) ...
+
+    -- Keyboard shift component
+    component KeyboardShift
+        Port (
+            ps2_dat : in STD_LOGIC;
+            ps2_clk : in STD_LOGIC;
+            clock_50 : in STD_LOGIC;
+            ledr : out STD_LOGIC_VECTOR(9 downto 0);
+            ledg : out STD_LOGIC_VECTOR(7 downto 0);
+            hex0 : out STD_LOGIC_VECTOR(6 downto 0)
+        );
+    end component;
+
+    signal keyboard_hex : std_logic_vector(6 downto 0);
+    signal keyboard_digit : integer := -1; -- A variable to hold the digit entered from the keyboard
+
+begin
+
+    -- Instantiate the KeyboardShift component
+    keyShift : KeyboardShift
+        port map (
+            ps2_dat => ps2_dat,
+            ps2_clk => ps2_clk,
+            clock_50 => clock_50,
+            ledr => open, -- Not connected
+            ledg => open, -- Not connected
+            hex0 => keyboard_hex
+        );
+
+    -- Process to detect the digit entered from the keyboard
+    process(clock_50)
+    begin
+        if rising_edge(clock_50) then
+            -- Decode the 7-segment hex display to obtain the digit
+            case keyboard_hex is
+                when "1000000" => keyboard_digit <= 0;
+                when "1111001" => keyboard_digit <= 1;
+                when "0100100" => keyboard_digit <= 2;
+                when "0110000" => keyboard_digit <= 3;
+                when "0011001" => keyboard_digit <= 4;
+                when "0010010" => keyboard_digit <= 5;
+                when "0000010" => keyboard_digit <= 6;
+                when "1111000" => keyboard_digit <= 7;
+                when "0000000" => keyboard_digit <= 8;
+                when "0010000" => keyboard_digit <= 9;
+                when others => keyboard_digit <= -1; -- No valid digit
+            end case;
+        end if;
+    end process;
+
+    -- ... (Your existing code for displaying hex values and state transition logic) ...
+
+    -- Modify the Button Input Handling process
+    -- to include the keyboard_digit signal as well
+    process(clock_50)
+    begin
+        if rising_edge(clock_50) then
+            -- existing logic for button input handling ...
+            
+            if key(3) = '1' and last_key(3) = '0' then	
+                digit_entered <= 1;
+            elsif key(2) = '1' and last_key(2) = '0' then
+                digit_entered <= 2;
+            elsif key(1) = '1' and last_key(1) = '0' then
+                digit_entered <= 3;
+            elsif key(0) = '1' and last_key(0) = '0' then
+                digit_entered <= 4;
+            elsif keyboard_digit /= -1 then
+                digit_entered <= keyboard_digit; -- Include the digit from the keyboard
+            else
+                digit_entered <= -1;
+            end if;
+
+            last_key <= key;  --A snapshot of the keys that have been pressed last time round
+        end if;
+    end process;
+
+    -- ... (Rest of your existing code) ...
+
+end architecture;
