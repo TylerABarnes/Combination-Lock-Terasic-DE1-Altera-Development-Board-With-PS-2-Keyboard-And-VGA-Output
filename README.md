@@ -4,3 +4,5 @@ A 4-digit combination lock programed through VHDL for the Terasic DE1 Altera Dev
 Provided is the Quartus II project file, VHDL files to be included in the project, and the pin assignments needed to run the code properly on the board.
 
 "VGA40" is the VGA controller, "KeyboardShift" is the PS/2 Keyboard Controller, and the final file is the main file.
+
+"Source.cpp" is a C++ file included which allows you to expand upon/change/make your own LUT table for the sinusoidal calculations found in this project.
